@@ -1,50 +1,7 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 ERROR="\e[1;31m"
 WARN="\e[93m"
 END="\e[0m"
-
-package_manager() {
-    if [[ "$(type -P apt)" ]]; then
-        PACKAGE_MANAGEMENT_INSTALL='apt -y --no-install-recommends install'
-        PACKAGE_MANAGEMENT_REMOVE='apt purge'
-        package_provide_tput='ncurses-bin'
-    elif [[ "$(type -P dnf)" ]]; then
-        PACKAGE_MANAGEMENT_INSTALL='dnf -y install'
-        PACKAGE_MANAGEMENT_REMOVE='dnf remove'
-        package_provide_tput='ncurses'
-    elif [[ "$(type -P yum)" ]]; then
-        PACKAGE_MANAGEMENT_INSTALL='yum -y install'
-        PACKAGE_MANAGEMENT_REMOVE='yum remove'
-        package_provide_tput='ncurses'
-    elif [[ "$(type -P zypper)" ]]; then
-        PACKAGE_MANAGEMENT_INSTALL='zypper install -y --no-recommends'
-        PACKAGE_MANAGEMENT_REMOVE='zypper remove'
-        package_provide_tput='ncurses-utils'
-    elif [[ "$(type -P pacman)" ]]; then
-        PACKAGE_MANAGEMENT_INSTALL='pacman -Syu --noconfirm'
-        PACKAGE_MANAGEMENT_REMOVE='pacman -Rsn'
-        package_provide_tput='ncurses'
-     elif [[ "$(type -P emerge)" ]]; then
-        PACKAGE_MANAGEMENT_INSTALL='emerge -qv'
-        PACKAGE_MANAGEMENT_REMOVE='emerge -Cv'
-        package_provide_tput='ncurses'
-    else
-        echo -e "${ERROR}ERROR:${END} The script does not support the package manager in this operating system."
-        exit 1
-    fi
-}
-
-install_software() {
-    package_name="$1"
-    file_to_detect="$2"
-    type -P "$file_to_detect" > /dev/null 2>&1 && return || echo -e "${WARN}WARN:${END} $package_name not installed, installing." && sleep 1
-    if ${PACKAGE_MANAGEMENT_INSTALL} "$package_name"; then
-        echo "INFO: $package_name is installed."
-    else
-        echo -e "${ERROR}ERROR:${END} Installation of $package_name failed, please check your network."
-        exit 1
-    fi
-}
 
 reg() {
     set -e
@@ -82,9 +39,6 @@ format() {
 }
 
 main() {
-    package_manager
-    install_software "xxd" "xxd"
-    install_software "python3" "python3"
     warp_info=$(reg) ; exit_code=$?
     if [[ $exit_code != 0 ]];then
         echo "$warp_info"
